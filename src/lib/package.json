@@ -1,0 +1,20 @@
+{
+  "name": "awsresource",
+  "version": "0.0.1",
+  "description": "package to manage aws ec2 and elastic beanstalk",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {},
+  "author": "yungez@microsoft.com",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {
+    "async": "^2.3.0",
+    "aws-sdk": "^2.41.0",
+    "chalk": "^1.1.3",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7",
+    "scp2": "^0.5.0",
+    "simple-ssh": "^0.9.0"
+  }
+}

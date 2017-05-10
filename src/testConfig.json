@@ -1,0 +1,38 @@
+{
+    "aws": {
+        "client": {
+            "type": "vm",
+            "os": "ubuntu",
+            "size": "t2.small",
+            "region": "us-east-1",
+            "name": "t2smalluseast1client",
+            "username": "ubuntu"
+        },
+        "resources": [
+            {
+                "type": "vm",
+                "os": "ubuntu",
+                "size": "t2.small",
+                "region": "us-east-1",
+                "username": "ubuntu"
+            },
+            {
+                "type": "elasticbeanstalk",
+                "size": "t2.small",
+                "region": "us-east-1"
+            }
+        ],
+        "testplan": {
+            "threadnum": 500,
+            "loopcount": 1,
+            "rampupseconds": 5,
+            "sampletestplan": "E:\\vsiot1\\javabenchmark\\app\\testplan\\sampleplan.jmx",
+            "testresultsfolder": "E:\\vsiot1\\javabenchmark\\testresults",
+            "testfile": "C:\\Users\\yungez\\Downloads\\What-is-docker-and-container.jpg"
+        },
+        "testapp": {
+            "dockerimage": "yungez/tomcat1"
+        },
+        "keypairpemfolder": "E:\\vsiot1\\awsjavabenchmark\\keypair"
+    }
+}

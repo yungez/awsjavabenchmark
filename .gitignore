@@ -1,0 +1,33 @@
+# Binary files
+*.dll
+*.exe
+*.pdb
+
+# User specific files
+*.sln.docstates
+*.suo
+*.user
+**/.idea
+**/.vscode
+**/config.aws.json
+
+# Build results
+DROP/
+msbuild.log
+node_modules
+TEMP/
+version.cs
+**/__pycache__
+
+# Test temp folder
+test_folder/
+testresults/
+app/testplan/
+keypair/
+
+#Mac
+.DS_Store
+
+
+# Logs
+npm-debug.log

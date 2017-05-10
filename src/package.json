@@ -1,0 +1,21 @@
+{
+  "name": "testrunner",
+  "version": "0.0.1",
+  "description": "aws java benchmark test tool",
+  "main": "./src/testrunner.js",
+  "scripts": {},
+  "repository": {},
+  "author": "yungez@microsoft.com",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {
+    "async": "^2.3.0",
+    "concat": "^1.0.3",
+    "csv-parser": "^1.11.0",
+    "fs-extra": "^3.0.1",
+    "json2csv": "^3.7.3",
+    "xmldom": "^0.1.27",
+    "xpath.js": "^1.0.7",
+    "yargs": "^8.0.1"
+  }
+}

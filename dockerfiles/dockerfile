@@ -1,0 +1,10 @@
+FROM tomcat:8.5-jre8
+
+MAINTAINER "yungez@microsoft.com"
+
+RUN apt-get update && apt-get install -y git maven openjdk-8-jdk
+
+RUN git clone https://github.com/yungez/javawebapp.git
+RUN cd javawebapp/testweb2 && mvn clean install && cp target/testweb2-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/testapp.war
+
+COPY server.xml /usr/local/tomcat/conf/server.xml
