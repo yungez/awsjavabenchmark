@@ -271,7 +271,15 @@ function manipulateEC2Instance(accessKeyId, accessKey, region, instanceId, actio
                     return callback(err, data);
                 } else {
                     console.log('stopping instance ' + instanceId + '...');
-                    return callback(err, data);
+                    ec2.waitFor('instanceStopped', statusParams, function (err, result) {
+                        if (err) {
+                            console.error('ec2 instance ' + instanceId + ' is not in stopped state..');
+                            return callback(err, null);
+                        } else {
+                            console.log('ec2 instance ' + instanceId + ' is stopped..');
+                            return callback(null, data);
+                        }
+                    });
                 }
             });
             break;
@@ -282,29 +290,27 @@ function terminateEC2Instance(accessKeyId, accessKey, region, instanceId, callba
     AWS.config = new AWS.Config({ accessKeyId: accessKeyId, secretAccessKey: accessKey, region: region });
     var ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
 
+    console.log('terminating ec2 instance ' + instanceId + '...');;
     ec2.terminateInstances({
         instanceIds: [instanceid], function(err, data) {
             if (err) {
                 console.error(err);
                 return callback(err, data);
-            }
-
-            for (var i in data.TerminatingInstances) {
-                var instance = data.TerminatingInstances[i];
-                console.log('terminated: ' + instance.instanceId);
-                return callback('', data);
+            } else {
+                ec2.waitFor('instanceTerminated', statusParams, function (err, result) {
+                    if (err) {
+                        console.error('ec2 instance ' + instanceId + ' is not in terminated state..');
+                        return callback(err, null);
+                    } else {
+                        console.log('ec2 instance ' + instanceId + ' is terminated..');
+                        return callback(null, data);
+                    }
+                });
             }
         }
-    })
+    });
 }
 
-function waitingForInstanceRunning(accessKeyId, accessKey, region, instanceId, callback) {
-    AWS.config = new AWS.Config({ accessKeyId: accessKeyId, secretAccessKey: accessKey, region: region });
-    var ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
-
-    // get ec2 instance status, till it's running
-
-}
 
 function describeNetworkInterface(accessKeyId, accessKey, region, networkInterfaceId, callback) {
     AWS.config = new AWS.Config({ accessKeyId: accessKeyId, secretAccessKey: accessKey, region: region });

@@ -159,4 +159,34 @@ function authorizeSecurityGroupIngress(accessKeyId, accessKey, region, securityG
     });
 }
 
+function deleteDBInstance(accessKeyId, accessKey, region, serverName, callback) {
+    AWS.config = new AWS.Config({ accessKeyId: accessKeyId, secretAccessKey: accessKey, region: region });
+    var rds = new AWS.RDS({ apiVersion: '2014-10-31' });
+
+    var params = {
+        DBInstanceIdentifier: serverName, /* required */
+        SkipFinalSnapshot: true
+    };
+
+    console.log('deleting mysql instance ' + serverName + '...');
+    rds.deleteDBInstance(params, function (err, data) {
+        if (err) {
+            console.error(err);
+            return callback(err, null);
+        } else {
+            rds.waitFor('dBInstanceDeleted', { DBInstanceIdentifier: serverName }, function (err, data) {
+                if (err) {
+                    console.error(err);
+                    return callback(err, data);
+                } else {
+                    return callback(null, data);
+                }
+            });
+        }
+    });
+
+}
+
+
 exports.createMySqlInstance = createMySqlInstance;
+exports.deleteDBInstance = deleteDBInstance;

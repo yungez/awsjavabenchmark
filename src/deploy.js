@@ -368,33 +368,67 @@ function deployTestAppToELB(accessKeyId, accessKey, region, envNameList, appPara
 }
 
 
-function runPostAction(postAction, awsResources) {
+function runPostAction(accessKeyId, accessKey, region, postAction, awsResources) {
     if (postAction) {
         if (postAction === 'stop') {
             async.each(awsResources,
                 function (target, cb) {
                     if (target.type === 'vm') {
-
-                    } else if (target.type === 'elasticbeanstalk') {
-
-                    } else if (target.type === 'mysql') {
-
+                        resource.stopAWSEC2Instance(accessKeyId, accessKey, region, target.instanceid, function (err, result) {
+                            if (err) {
+                                console.error(err);
+                                return cb(err);
+                            } else {
+                                console.log('ec2 ' + target.name + ' was stopped');
+                                return cb();
+                            }
+                        });
+                    } else {
+                        console.log(`resource type ${target.type} cannot be stopped`);
+                        return cb();
                     }
                 }, function (err) {
-
+                    if (err) console.error(err);
                 });
         } else if (postAction === 'delete') {
             async.each(awsResources,
                 function (target, cb) {
                     if (target.type === 'vm') {
-
+                        resource.terminateAWSEC2Instance(accessKeyId, accessKey, region, target.instanceid, function (err, result) {
+                            if (err) {
+                                console.error(err);
+                                return cb(err);
+                            } else {
+                                console.log('ec2 ' + target.name + ' was terminated');
+                                return cb();
+                            }
+                        });
                     } else if (target.type === 'elasticbeanstalk') {
-
+                        resource.deleteAWSElasticBeanStalk(accessKeyId, accessKey, region, target.name, function (err, result) {
+                            if (err) {
+                                console.error(err);
+                                return cb(err);
+                            } else {
+                                console.log('elasticbeanstalk ' + target.name + ' was deleted');
+                                return cb();
+                            }
+                        });
                     } else if (target.type === 'mysql') {
-
+                        resource.deleteDBInstance(accessKeyId, accessKey, region, target.name, function (err, result) {
+                            if (err) {
+                                console.error(err);
+                                return cb(err);
+                            } else {
+                                console.log('mysql ' + target.name + ' was deleted');
+                                return cb();
+                            }
+                        });
+                    } else {
+                        console.log(`resource type ${target.type} cannot be deleted`);
+                        return cb();
                     }
                 }, function (err) {
-
+                    if (err) console.error(err);
                 });
         } else {
             console.log('invalid postAction: ' + postAction);

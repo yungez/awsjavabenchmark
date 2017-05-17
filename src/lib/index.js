@@ -17,16 +17,8 @@ resource.updateEnvironment = function (accessKeyId, accessKey, region, envName, 
     return awsElasticBeanStalk.updateEnvironment(accessKeyId, accessKey, region, envName, optionSettings, callback);
 }
 
-resource.startAWSElasticBeanStalk = function (accessKeyId, accessKey, region) {
-
-}
-
-resource.stopAWSElasticBeanStalk = function (accessKeyId, accessKey, region) {
-
-}
-
-resource.deleteAWSElasticBeanStalk = function (accessKeyId, accessKey, region) {
-
+resource.deleteAWSElasticBeanStalk = function (accessKeyId, accessKey, region, appName, callback) {
+    return awsElasticBeanStalk.deleteApplication(accessKeyId, accessKey, region, appName, callback);
 }
 
 // 2. EC2
@@ -53,6 +45,10 @@ resource.describeAWSEC2InstanceNetworkInterface = function (accessKeyId, accessK
 // 3. mysql
 resource.createAWSMySqlInstance = function (accessKeyId, accessKey, region, serverName, size, userName, password, sqlScripts, callback) {
     return rds.createMySqlInstance(accessKeyId, accessKey, region, serverName, size, userName, password, sqlScripts, callback);
+}
+
+resource.deleteDBInstance = function (accessKeyId, accessKey, region, serverName, callback) {
+    return rds.deleteDBInstance(accessKeyId, accessKey, region, serverName, callback);
 }
 
 module.exports = resource;

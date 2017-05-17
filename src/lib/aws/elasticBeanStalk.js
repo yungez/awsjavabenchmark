@@ -213,6 +213,27 @@ function createElasticBeanstalkWebApp(accessKeyId, accessKey, region, appName, e
     })
 }
 
+function deleteApplication(accessKeyId, accessKey, region, appName, callback) {
+    AWS.config = new AWS.Config({ accessKeyId: accessKeyId, secretAccessKey: accessKey, region: region });
+    var elasticBeanStalk = new AWS.ElasticBeanstalk({ apiVersion: '2010-12-01' });
+
+    var params = {
+        ApplicationName: appName, /* required */
+        TerminateEnvByForce: true
+    };
+
+    console.log('deleting application: ' + appName);
+    elasticBeanStalk.deleteApplication(params, function (err, result) {
+        if (err) {
+            console.error(err);
+            return callback(err);
+        } else {
+            utils.sleep(240000);
+            return callback();
+        }
+    })
+}
 
 exports.updateEnvironment = updateEnvironment;
 exports.createElasticBeanstalkWebApp = createElasticBeanstalkWebApp;
+exports.deleteApplication = deleteApplication;

@@ -171,7 +171,9 @@ deploy.createAWSResource(accessKeyId, accessKey, testConfig.aws.resources, funct
                                         console.log('test log file: ' + output.locallogfile);
 
                                         // execute postAction to stop or delete test resources, including test target and client
-
+                                        if (postAction) {
+                                            deploy.runPostAction(accessKeyId, accesskey, region, resources.concat(clients));
+                                        }
                                         return 0;
                                     }
                                 });
