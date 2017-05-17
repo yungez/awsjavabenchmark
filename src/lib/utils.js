@@ -5,6 +5,9 @@ const fs = require('fs');
 const path = require('path');
 const scp2 = require('scp2');
 const chalk = require('chalk');
+const sql = require('mysql');
+const async = require('async');
+const readline = require('linebyline');
 /**
  * Finds SSH key
  * @returns {string}
@@ -181,8 +184,45 @@ function sleep(milliseconds) {
   }
 }
 
+function execSqlScripts(host, userName, pwd, scriptFileList) {
+  var dbConfig = {
+    host: host,
+    user: userName,
+    password: pwd,
+    port: 3306
+  };
+
+  async.each(scriptFileList,
+    function (scriptFile, cb) {
+      console.log('executing script: ' + scriptFile);
+      var conn = sql.createConnection(dbConfig);
+      var rl = readline(scriptFile);
+
+      rl.on('line', function (line, lineCount, byteCount) {
+        if (line.length !== 0) {
+          conn.query(line.toString('utf8'), function (err, sets, fields) {
+            if (err) {
+              console.error(err);
+            }
+          });
+        }
+      }).on('error', function (err) {
+        console.error(err);
+      }).on('close', function () {
+        conn.end();
+      });
+    }, function (err) {
+      if (err) {
+        console.error('failed to executing sql scripts..\n' + err);
+      } else {
+        console.log('sql scripts execution done.');
+      }
+    });
+}
+
 exports.generateRandomId = generateRandomId;
 exports.sshExecCmd = sshExecCmd;
 exports.uploadFilesViaScp = uploadFilesViaScp;
 exports.downloadFilesViaScp = downloadFilesViaScp;
 exports.sleep = sleep;
+exports.execSqlScripts = execSqlScripts;

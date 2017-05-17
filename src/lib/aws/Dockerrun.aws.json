@@ -1,1 +1,1 @@
-{"AWSEBDockerrunVersion":1,"Image":{"Name": "yungez/tomcat1"},"Ports":[{"ContainerPort":"80"}]}
+{"AWSEBDockerrunVersion":1,"Image":{"Name":"yungez/javatestapp1"},"Ports":[{"ContainerPort":"3322"}]}

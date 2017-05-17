@@ -17,7 +17,7 @@ function createOrGetBucket(accessKeyId, accessKey, region, bucketName, callback)
             if (err.statusCode === 400 || err.statusCode === 409) {
                 // bucket already exists
                 // 409: BucketAlreadyOwnedByYou: Your previous request to create the named bucket succeeded and you already own it.
-                console.log('bucket already exists');
+                //console.log('bucket already exists');
                 return callback(null, result);
             } else {
                 console.error(err);
@@ -48,7 +48,7 @@ function uploadFile(accessKeyId, accessKey, region, bucketName, fileName, localf
             if (err) {
                 console.error('upload file error ' + err);
             }
-            console.log(`uploading file ${localfileName} to s3 bucket ${bucketName}`);
+            //console.log(`uploading file ${localfileName} to s3 bucket ${bucketName}`);
             return callback(err, result);
         });
     });

@@ -4,35 +4,41 @@
             "type": "vm",
             "os": "ubuntu",
             "size": "t2.small",
-            "region": "us-east-1",
+            "region": "us-west-1",
             "name": "t2smalluseast1client",
             "username": "ubuntu"
         },
         "resources": [
             {
-                "type": "vm",
-                "os": "ubuntu",
-                "size": "t2.small",
-                "region": "us-east-1",
-                "username": "ubuntu"
-            },
-            {
                 "type": "elasticbeanstalk",
                 "size": "t2.small",
-                "region": "us-east-1"
+                "region": "us-west-1"
+            },
+            {
+                "type": "mysql",
+                "size": "db.t2.micro",
+                "username": "yungez",
+                "password": "#Bugsfor$123",
+                "region": "us-west-1",
+                "database": "moviedb",
+                "scripts": [
+                    "E:\\vsiot1\\movie-db-java-on-azure\\database\\schema\\DDL.sql",
+                    "E:\\vsiot1\\movie-db-java-on-azure\\database\\data\\data.sql"
+                ]
             }
         ],
         "testplan": {
-            "threadnum": 500,
+            "threadnum": 50,
             "loopcount": 1,
             "rampupseconds": 5,
-            "sampletestplan": "E:\\vsiot1\\javabenchmark\\app\\testplan\\sampleplan.jmx",
+            "sampletestplan": "E:\\vsiot1\\awsjavabenchmark1\\src\\testplan\\sampleplan.jmx",
             "testresultsfolder": "E:\\vsiot1\\javabenchmark\\testresults",
             "testfile": "C:\\Users\\yungez\\Downloads\\What-is-docker-and-container.jpg"
         },
         "testapp": {
-            "dockerimage": "yungez/tomcat1"
+            "dockerimage": "yungez/javatestapp1",
+            "containerport": "3322"
         },
-        "keypairpemfolder": "E:\\vsiot1\\awsjavabenchmark\\keypair"
+        "keypairpemfolder": "E:\\vsiot1\\awsjavabenchmark1\\keypair"
     }
 }

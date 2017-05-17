@@ -7,7 +7,7 @@ const utils = require('../utils.js');
 
 function createKeyPair(accessKeyId, accessKey, region, keyName, pemfileName, callback) {
     AWS.config = new AWS.Config({ accessKeyId: accessKeyId, secretAccessKey: accessKey, region: region });
-    var ec2 = new AWS.EC2({ apiVersio: '2016-11-15' });
+    var ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
 
     var params = {
         KeyNames: [keyName]
@@ -37,7 +37,7 @@ function createKeyPair(accessKeyId, accessKey, region, keyName, pemfileName, cal
 
 function createEC2Instance(accessKeyId, accessKey, name, region, osType, instanceType, keyPairFileFolder, callback) {
     AWS.config = new AWS.Config({ accessKeyId: accessKeyId, secretAccessKey: accessKey, region: region });
-    var ec2 = new AWS.EC2({ apiVersio: '2016-11-15' });
+    var ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
 
     // available region : http://docs.aws.amazon.com/general/latest/gr/rande.html
     var imageIds = require('./amiConfig.json');
@@ -82,6 +82,7 @@ function createEC2Instance(accessKeyId, accessKey, name, region, osType, instanc
             }
         ]
     }
+    console.log(`creating instance ${name}`);
     ec2.describeInstances(filterParams, function (err, found) {
         //console.log('found is ; ' + JSON.stringify(found));
         var keyPairFile = path.resolve(keyPairFileFolder + '\\' + keyPairName + '.pem');
@@ -98,7 +99,6 @@ function createEC2Instance(accessKeyId, accessKey, name, region, osType, instanc
                         return callback(err, data);
                     }
                     var instanceId = data.Instances[0].InstanceId;
-                    console.log(`creating instance ${name} with id ${instanceId}`);
 
                     params = {
                         Resources: [instanceId],
@@ -139,7 +139,22 @@ function createEC2Instance(accessKeyId, accessKey, name, region, osType, instanc
                                 if (err && err.statusCode !== 400) return callback(err, result);
                                 var newinstance = data.Instances[0];
                                 newinstance['keypairfile'] = keyPairFile;
-                                return callback(null, data.Instances[0]); // return instance object
+                                var statusParams = {
+                                    InstanceIds: [
+                                        instanceId
+                                    ]
+                                };
+
+                                ec2.waitFor('instanceRunning', statusParams, function (err, result) {
+                                    if (err) {
+                                        console.error('ec2 instance ' + instanceId + ' is not in running state..');
+                                        return callback(err, null);
+                                    } else {
+                                        console.log('ec2 instance ' + instanceId + ' is running..');
+                                        return callback(null, data.Instances[0]); // return instance object
+                                    }
+                                });
+
                             });
                         });
                     });
@@ -147,10 +162,9 @@ function createEC2Instance(accessKeyId, accessKey, name, region, osType, instanc
             })
         } else if (found.Reservations[0].Instances.length > 0) {
             // found, start and return first instance
-
             var exist = found.Reservations[0].Instances[0];
             exist['keypairfile'] = keyPairFile;
-            console.log('ec2 instance ' + name + ' exists already with id ' + exist.InstanceId);
+            console.log('ec2 instance ' + name + ' already exists with id ' + exist.InstanceId);
             return callback(null, exist);
         } else {
             return callback('internal error', null);
@@ -162,7 +176,7 @@ function createEC2Instance(accessKeyId, accessKey, name, region, osType, instanc
 function findImage(accessKeyId, accessKey, keyword, region, callback) {
     // switch region
     AWS.config = new AWS.Config({ accessKeyId: accessKeyId, secretAccessKey: accessKey, region: region });
-    var ec2 = new AWS.EC2({ apiVersio: '2016-11-15' });
+    var ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
 
     var imageParams = {
         Filters: [
@@ -217,7 +231,7 @@ function findImage(accessKeyId, accessKey, keyword, region, callback) {
 
 function manipulateEC2Instance(accessKeyId, accessKey, region, instanceId, action, callback) {
     AWS.config = new AWS.Config({ accessKeyId: accessKeyId, secretAccessKey: accessKey, region: region });
-    var ec2 = new AWS.EC2({ apiVersio: '2016-11-15' });
+    var ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
 
     var params = {
         InstanceIds: [instanceId],
@@ -238,18 +252,15 @@ function manipulateEC2Instance(accessKeyId, accessKey, region, instanceId, actio
                         ]
                     };
 
-                    utils.sleep(120000);
-                    ec2.describeInstances(params, function (err, status) {
-                        if (err) return callback(err, status);
-                        //console.log('data is : ' + JSON.stringify(status));
-                        if (status.Reservations[0].Instances[0].State.Name !== 'running') {
-                            //console.log('data is : ' + JSON.stringify(status));
-                            console.log('instance status: not running ' + status.Reservations[0].Instances[0].State.Name);
-                            return callback(err, data);
+                    ec2.waitFor('instanceRunning', statusParams, function (err, result) {
+                        if (err) {
+                            console.error('ec2 instance ' + instanceId + ' is not in running state..');
+                            return callback(err, null);
+                        } else {
+                            console.log('ec2 instance ' + instanceId + ' is running..');
+                            return callback(null, data);
                         }
                     });
-
-                    return callback(err, data);
                 }
             });
             break;
@@ -258,9 +269,10 @@ function manipulateEC2Instance(accessKeyId, accessKey, region, instanceId, actio
                 if (err) {
                     console.error(err);
                     return callback(err, data);
+                } else {
+                    console.log('stopping instance ' + instanceId + '...');
+                    return callback(err, data);
                 }
-                console.log('stopping instance ' + instanceId + '...');
-                return callback(err, data);
             });
             break;
     };
@@ -268,7 +280,7 @@ function manipulateEC2Instance(accessKeyId, accessKey, region, instanceId, actio
 
 function terminateEC2Instance(accessKeyId, accessKey, region, instanceId, callback) {
     AWS.config = new AWS.Config({ accessKeyId: accessKeyId, secretAccessKey: accessKey, region: region });
-    var ec2 = new AWS.EC2({ apiVersio: '2016-11-15' });
+    var ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
 
     ec2.terminateInstances({
         instanceIds: [instanceid], function(err, data) {
@@ -288,7 +300,7 @@ function terminateEC2Instance(accessKeyId, accessKey, region, instanceId, callba
 
 function waitingForInstanceRunning(accessKeyId, accessKey, region, instanceId, callback) {
     AWS.config = new AWS.Config({ accessKeyId: accessKeyId, secretAccessKey: accessKey, region: region });
-    var ec2 = new AWS.EC2({ apiVersio: '2016-11-15' });
+    var ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
 
     // get ec2 instance status, till it's running
 
@@ -296,7 +308,7 @@ function waitingForInstanceRunning(accessKeyId, accessKey, region, instanceId, c
 
 function describeNetworkInterface(accessKeyId, accessKey, region, networkInterfaceId, callback) {
     AWS.config = new AWS.Config({ accessKeyId: accessKeyId, secretAccessKey: accessKey, region: region });
-    var ec2 = new AWS.EC2({ apiVersio: '2016-11-15' });
+    var ec2 = new AWS.EC2({ apiVersion: '2016-11-15' });
 
     var params = {
         NetworkInterfaceIds: [
