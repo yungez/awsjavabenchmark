@@ -119,7 +119,7 @@ function createEnvironment(accessKeyId, accessKey, region, name, appName, soluti
                 console.error(err);
                 return callback(err, data);
             } else {
-                utils.sleep(300000);
+                utils.sleep(360000);
                 console.log('creating environment done.. \n');
                 return callback(null, data);
             }
@@ -177,7 +177,7 @@ function updateEnvironment(accessKeyId, accessKey, region, envName, optionSettin
             return callback(err, result);
         } else {
             console.log('updating environment done...');
-            utils.sleep(120000);
+            utils.sleep(300000);
             return callback(null, result);
         }
     })

@@ -86,6 +86,7 @@ function createMySql(accessKeyId, accessKey, region, size, serverName, userName,
                     console.error(err);
                     return callback(err, data);
                 } else {
+                    utils.sleep(180000);
                     var dbEndpoint = mysql.DBInstances[0].Endpoint;
                     var dbAddress = 'jdbc:mysql://' + dbEndpoint.Address + ':' + dbEndpoint.Port;
                     var dbInfo = { address: dbAddress, username: userName, password: password }

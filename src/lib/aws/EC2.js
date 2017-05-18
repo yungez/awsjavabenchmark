@@ -150,6 +150,7 @@ function createEC2Instance(accessKeyId, accessKey, name, region, osType, instanc
                                         console.error('ec2 instance ' + instanceId + ' is not in running state..');
                                         return callback(err, null);
                                     } else {
+                                        utils.sleep(300000);
                                         console.log('ec2 instance ' + instanceId + ' is running..');
                                         return callback(null, data.Instances[0]); // return instance object
                                     }

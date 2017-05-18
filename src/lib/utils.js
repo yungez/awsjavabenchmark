@@ -146,6 +146,10 @@ function downloadFilesViaScp(sourceFiles, destFiles, hostaddress, username, keyF
     if (!fs.existsSync(path.dirname(destFile))) {
       fs.mkdirSync(path.dirname(destFile));
     }
+
+    if (fs.existsSync(destFile)) {
+      fs.renameSync(destFile, destFile + '_bak' + generateRandomId(''));
+    }
   }
 
   scp2.scp(scpOptions, destFiles[0], function (err) {
@@ -195,6 +199,7 @@ function execSqlScripts(host, userName, pwd, scriptFileList) {
   async.each(scriptFileList,
     function (scriptFile, cb) {
       console.log('executing script: ' + scriptFile);
+      sleep(60000);
       var conn = sql.createConnection(dbConfig);
       var rl = readline(scriptFile);
 
